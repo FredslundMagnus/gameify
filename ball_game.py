@@ -19,20 +19,20 @@ class Ball(GameObject):
 
     def update(self, platforms: list[Platform]):
         self.speed = (self.speed[0], self.speed[1] + self.gravity)
-        self.center = (self.center[0], self.center[1] + self.speed[1])
+        self.center = (self.center[0] + self.speed[0], self.center[1] + self.speed[1])
         for platform in platforms:
             if not platform.rect.colliderect(self.rect):
                 continue
 
             if platform.rect.top <= self.rect.bottom:
                 self.speed = (self.speed[0], -abs(self.speed[1]))
-            if platform.rect.top >= self.rect.bottom:
-                self.speed = (self.speed[0], abs(self.speed[1]))
+            # if platform.rect.top >= self.rect.bottom:
+            #     self.speed = (self.speed[0], abs(self.speed[1]))
 
-            if platform.rect.left <= self.rect.right:
-                self.speed = (-abs(self.speed[0]), self.speed[1])
-            if platform.rect.left >= self.rect.right:
-                self.speed = (abs(self.speed[0]), self.speed[1])
+            # if platform.rect.left <= self.rect.right:
+            #     self.speed = (-abs(self.speed[0]), self.speed[1])
+            # if platform.rect.left >= self.rect.right:
+            #     self.speed = (abs(self.speed[0]), self.speed[1])
 
 
 class Platform(GameObject):
@@ -46,8 +46,8 @@ class Platform(GameObject):
 
 class BallGame(Game):
     def create(self) -> None:
-        self.balls = [Ball((140, 120), 30), Ball((240, 120), 30)]
-        self.platforms = [Platform(0, 300, 400, 20)]
+        self.balls = [Ball((140, 120), 30, (1, 0)), Ball((240, 120), 30, (-1, 0))]
+        self.platforms = [Platform(0, 300, 400, 20), Platform(40, 50, 20, 400), Platform(340, 50, 20, 400)]
 
     def draw(self, screen: Screen) -> None:
         screen.background(Colors.blue)
