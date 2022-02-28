@@ -5,9 +5,11 @@ from ball_game import BallGame
 from pygame.event import get as events
 from compiler import compile, Code
 
+level = 1
+
 size = init()
 clock = Clock()
-code: Code = compile("levels/level1.fun")
+code: Code = compile(f"levels/level{level}.fun")
 game = code.game
 
 while True:
@@ -16,6 +18,13 @@ while True:
         if e.type == QUIT:
             close_game()
             quit()
+        if e.type == 768 and e.key == 114:
+            code = compile(f"levels/level{level}.fun")
+            game = code.game
+        if e.type == 768 and e.key in {49, 50, 51, 52, 53, 54, 55, 56, 57}:
+            level = e.key - 48
+            code = compile(f"levels/level{level}.fun")
+            game = code.game
     code.execute()
     game.update()
     game.draw(game.screen)

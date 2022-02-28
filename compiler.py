@@ -13,6 +13,7 @@ class Code:
         self.frame = 0
         self.next = 0
         self.elements = {}
+        self.game.objects = self.elements
 
     def execute(self) -> None:
         if self.frame == self.next:
@@ -35,9 +36,7 @@ class Code:
                         for attribute in parts[1:-1]:
                             obj = obj.__getattribute__(attribute)
                         setter = parts[-1]
-                        print(obj, value, obj.__getattribute__(setter))
                         obj.__setattr__(setter, value)
-                        print(obj, value, obj.__getattribute__(setter))
                     else:
                         print(self.frame, line)
                 except Exception as e:

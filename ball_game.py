@@ -2,9 +2,6 @@ from __future__ import annotations
 from imports import *
 
 
-
-
-
 class Ball(GameObject):
     def __init__(self, center: tuple[float, float], radius: float, speed: tuple[float, float] = (0, 0), color: Color = Colors.red) -> None:
         self.center = XandY(*center)
@@ -50,9 +47,18 @@ class Platform(GameObject):
 class BallGame(Game):
     elements = {"Ball": Ball, "Platform": Platform}
 
+    @property
+    def balls(self) -> Ball:
+        return [o for o in self.objects.values() if o.__class__ == Ball]
+
+    @property
+    def platforms(self) -> Ball:
+        return [o for o in self.objects.values() if o.__class__ == Platform]
+
     def create(self) -> None:
-        self.balls = [Ball((140, 120), 30, (1, 0)), Ball((240, 120), 30, (-1, 0))]
-        self.platforms = [Platform(0, 300, 400, 20), Platform(40, 50, 20, 400), Platform(340, 50, 20, 400)]
+        pass
+        # self.balls = [Ball((140, 120), 30, (1, 0)), Ball((240, 120), 30, (-1, 0))]
+        # self.platforms = [Platform(0, 300, 400, 20), Platform(40, 50, 20, 400), Platform(340, 50, 20, 400)]
 
     def draw(self, screen: Screen) -> None:
         screen.background(Colors.blue)
