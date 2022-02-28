@@ -14,5 +14,6 @@ while True:
         if e.type == QUIT:
             close_game()
             quit()
+    game.update()
     game.draw(game.screen)
     flip()

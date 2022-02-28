@@ -2,8 +2,7 @@ from screen import Screen
 
 
 class GameObject:
-    def update(self):
-        pass
+    gravity: float = 0.1
 
     def draw(self, screen: Screen):
         pass
