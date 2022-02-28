@@ -54,7 +54,6 @@ class Goal(GameObject):
         self.speed = XandY(*speed)
 
     def draw(self, screen: Screen):
-        # screen.draw_rect(self.color, self.rect)
         n = 5
         top, left = self.rect.top, self.rect.left
         width, height = self.rect.width/n, self.rect.height/n
