@@ -6,6 +6,8 @@ let platforms_1 be Platform(20, 300, 100, 20)
 let platforms_2 be Platform(220, 300, 100, 20)
 let platforms_3 be Platform(420, 300, 100, 20)
 
+let goal be Goal(550, 110, 50, 50)
+
 
 # SOLUTION
 wait 60 frames
