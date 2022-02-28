@@ -3,5 +3,6 @@ from game import Game
 from pygame.rect import Rect
 from screen import Screen
 from game_object import GameObject
+from utils import XandY
 
-imports = [Color, Colors, Game, Rect, Screen, GameObject]
+imports = [Color, Colors, Game, Rect, Screen, GameObject, XandY]
