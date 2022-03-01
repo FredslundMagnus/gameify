@@ -3,6 +3,16 @@ from ball_game import BallGame
 from game import Game
 
 
+def findBloc(theLines: list[str]) -> tuple[list[str], str]:
+    lines = []
+    while True:
+        temp = theLines.pop(0)
+        if temp == "}":
+            break
+        lines.append(temp)
+    return lines, temp
+
+
 class Executer:
     blocks: list[list[Block]] = [[]]
 
@@ -49,34 +59,18 @@ class Block:
                     obj.__setattr__(setter, value)
                 elif "after" in line and "frames" in line and line.endswith("{"):
                     n = int(eval(line.split(" ")[1], self.scope))
-                    lines = []
-                    while True:
-                        temp = self.lines.pop(0)
-                        if temp == "}":
-                            break
-                        lines.append(temp)
+                    lines, _ = findBloc(self.lines)
                     Executer.add(Block(lines, self.scope.copy()), frame=n)
                 elif "every" in line and "frames" in line and line.endswith("{"):
                     n = int(eval(line.split(" ")[1], self.scope))
-                    lines = []
-                    while True:
-                        temp = self.lines.pop(0)
-                        if temp == "}":
-                            break
-                        lines.append(temp)
-                    temp = [l for l in lines]
-                    lines.append(f"every {n} frames "+"{")
-                    lines.extend(temp)
-                    lines.append("}")
-                    Executer.add(Block(lines, self.scope.copy()), frame=n)
+                    lines, _ = findBloc(self.lines)
+                    scope = self.scope.copy()
+                    Executer.add(Block(lines, scope), frame=n)  # frame=0, hvis man vil have den gør det første gang også
+                    block = [f"every {n} frames "+"{", *(lines.copy()), "}"]
+                    Executer.add(Block(block, scope), frame=n)
                 elif "loop" in line and "times" in line and line.endswith("{"):
                     n = int(eval(line.split(" ")[1], self.scope))
-                    lines = []
-                    while True:
-                        temp = self.lines.pop(0)
-                        if temp == "}":
-                            break
-                        lines.append(temp)
+                    lines, _ = findBloc(self.lines)
                     for _ in range(n):
                         Executer.add(Block(lines.copy(), self.scope))
                 elif line.startswith("do"):
