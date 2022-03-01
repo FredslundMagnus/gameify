@@ -48,7 +48,7 @@ class Block:
                     setter = parts[-1]
                     obj.__setattr__(setter, value)
                 elif "after" in line and "frames" in line and line.endswith("{"):
-                    n = int(line.split(" ")[1])
+                    n = int(eval(line.split(" ")[1], self.scope))
                     lines = []
                     while True:
                         temp = self.lines.pop(0)
@@ -57,7 +57,7 @@ class Block:
                         lines.append(temp)
                     Executer.add(Block(lines, self.scope.copy()), frame=n)
                 elif "every" in line and "frames" in line and line.endswith("{"):
-                    n = int(line.split(" ")[1])
+                    n = int(eval(line.split(" ")[1], self.scope))
                     lines = []
                     while True:
                         temp = self.lines.pop(0)
@@ -65,12 +65,22 @@ class Block:
                             break
                         lines.append(temp)
                     temp = [l for l in lines]
-                    lines.append("every 50 frames {")
+                    lines.append(f"every {n} frames "+"{")
                     lines.extend(temp)
                     lines.append("}")
                     Executer.add(Block(lines, self.scope.copy()), frame=n)
+                elif "loop" in line and "times" in line and line.endswith("{"):
+                    n = int(eval(line.split(" ")[1], self.scope))
+                    lines = []
+                    while True:
+                        temp = self.lines.pop(0)
+                        if temp == "}":
+                            break
+                        lines.append(temp)
+                    for _ in range(n):
+                        Executer.add(Block(lines.copy(), self.scope))
                 else:
-                    print(self.frame, line)
+                    eval(line, self.scope)
             except Exception as e:
                 raise Exception(f"{e}\nYou have an error in the line:\n{line}")
 
