@@ -48,6 +48,28 @@ class Block:
                         obj = obj.__getattribute__(attribute)
                     setter = parts[-1]
                     obj.__setattr__(setter, value)
+                elif "after" in line and "frames" in line and line.endswith("{"):
+                    n = int(line.split(" ")[1])
+                    lines = []
+                    while True:
+                        temp = self.lines.pop(0)
+                        if temp == "}":
+                            break
+                        lines.append(temp)
+                    Executer.add(Block(lines, self.scope.copy()), frame=n)
+                elif "every" in line and "frames" in line and line.endswith("{"):
+                    n = int(line.split(" ")[1])
+                    lines = []
+                    while True:
+                        temp = self.lines.pop(0)
+                        if temp == "}":
+                            break
+                        lines.append(temp)
+                    temp = [l for l in lines]
+                    lines.append("every 50 frames {")
+                    lines.extend(temp)
+                    lines.append("}")
+                    Executer.add(Block(lines, self.scope.copy()), frame=n)
                 else:
                     print(self.frame, line)
             except Exception as e:

@@ -9,43 +9,54 @@ let platforms_3 be Platform(420, 300, 100, 20)
 
 let goal be Goal(550, 110, 50, 50)
 
-every 50 frames {
+set platforms_1.speed.x to 1
+set platforms_3.speed.x to 1
+
+after 50 frames {
     set platforms_1.speed.x to -platforms_1.speed.x
 }
 
+every 50 frames {
+    set platforms_3.speed.x to -platforms_3.speed.x
+}
+
+
+wait 20 frames
+
+set platforms_2.speed.x to 1
 # SOLUTION
-make change_x_direction(obj) {
-    set obj.speed.x to -obj.speed.x
-}
+# make change_x_direction(obj) {
+#     set obj.speed.x to -obj.speed.x
+# }
 
-after 75 frames {
-    change_x_direction(platforms_1)
-}
+# after 75 frames {
+#     change_x_direction(platforms_1)
+# }
 
-print(3)
+# print(3)
 
-make fib(n) {
-    if n == 1 or n == 2{
-        return 1
-    } else {
-        return fib(n-1) + fib(n-2)
-    }
-}
+# make fib(n) {
+#     if n == 1 or n == 2{
+#         return 1
+#     } else {
+#         return fib(n-1) + fib(n-2)
+#     }
+# }
 
-loop 2 times {
-    print(fib(5))
-}
-
-
-print(fib(1))
-print(fib(2))
-print(fib(3))
-print(fib(4))
-print(fib(5))
-
-set ball_1.speed.x to 10
+# loop 2 times {
+#     print(fib(5))
+# }
 
 
-"(?<=(make |call ))([a-z]+[a-z_0-9]*)"
+# print(fib(1))
+# print(fib(2))
+# print(fib(3))
+# print(fib(4))
+# print(fib(5))
 
-"match": "([a-z]+[a-z_0-9]*)(?=\\(.*\\))"
+# set ball_1.speed.x to 10
+
+
+# "(?<=(make |call ))([a-z]+[a-z_0-9]*)"
+
+# "match": "([a-z]+[a-z_0-9]*)(?=\\(.*\\))"
