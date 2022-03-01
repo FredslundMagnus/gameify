@@ -1,7 +1,7 @@
 type BallGame
 
 # SETUP
-let ball be Ball((70, 120), 30.2)
+let ball be Ball((70, 120), 30.2, color=Colors.green)
 
 let platforms_1 be Platform(20, 300, 100, 20)
 let platforms_2 be Platform(220, 300, 100, 20)

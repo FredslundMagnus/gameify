@@ -14,15 +14,15 @@ every 50 frames {
 }
 
 # SOLUTION
-make change_x_direction(obj) {
-    set obj.speed.x to -obj.speed.x
-}
+# make change_x_direction(obj) {
+#     set obj.speed.x to -obj.speed.x
+# }
 
 after 75 frames {
     change_x_direction(platforms_1)
 }
 
-
+print(3)
 
 make fib(n) {
     if n == 1 or n == 2{

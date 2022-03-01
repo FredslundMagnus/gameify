@@ -67,7 +67,7 @@ class Goal(GameObject):
 
 
 class BallGame(Game):
-    elements = {"Ball": Ball, "Platform": Platform, "Goal": Goal}
+    types = [Ball, Platform, Goal, Colors]
 
     @property
     def balls(self) -> list[Ball]:

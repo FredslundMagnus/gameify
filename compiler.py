@@ -29,8 +29,8 @@ class Code:
                         value = eval(" ".join(values), self.game.elements)
                         self.elements[name] = value
                     elif "set" in line and "to" in line:
-                        _, part, _, _value = line.split(" ")
-                        value = float(_value)
+                        _, part, _, *values = line.split(" ")
+                        value = eval(" ".join(values), self.elements)
                         parts = part.split(".")
                         obj = self.elements[parts[0]]
                         for attribute in parts[1:-1]:
