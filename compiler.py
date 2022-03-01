@@ -1,5 +1,5 @@
 from __future__ import annotations
-from ball_game import BallGame, Ball, Platform
+from ball_game import BallGame
 from game import Game
 
 
@@ -12,7 +12,7 @@ class Code:
         self.lines = lines
         self.frame = 0
         self.next = 0
-        self.elements = {}
+        self.elements = self.game.elements
         self.game.objects = self.elements
 
     def execute(self) -> None:
@@ -26,7 +26,7 @@ class Code:
                         break
                     elif "let" in line and "be" in line:
                         _, name, _, *values = line.split(" ")
-                        value = eval(" ".join(values), self.game.elements)
+                        value = eval(" ".join(values), self.elements)
                         self.elements[name] = value
                     elif "set" in line and "to" in line:
                         _, part, _, *values = line.split(" ")
