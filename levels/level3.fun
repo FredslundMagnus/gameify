@@ -24,14 +24,14 @@ every 50 frames {
 wait 20 frames
 
 loop 4 times {
-    print("Hej")
+    do print("Hej")
 }
 
 wait 80 frames
 
 let x be 100
 every 20 frames {
-    print(x)
+    do print(x)
     let x be x-1
 }
 

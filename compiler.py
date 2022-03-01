@@ -79,8 +79,10 @@ class Block:
                         lines.append(temp)
                     for _ in range(n):
                         Executer.add(Block(lines.copy(), self.scope))
+                elif line.startswith("do"):
+                    eval(line[3:], self.scope)
                 else:
-                    eval(line, self.scope)
+                    print(line, self.scope)
             except Exception as e:
                 raise Exception(f"{e}\nYou have an error in the line:\n{line}")
 
