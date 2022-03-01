@@ -1,4 +1,5 @@
 type BallGame
+
 # SETUP
 let ball_1 be Ball((140, 120), 30.2)
 let ball_2 be Ball((240, 120), 30)
@@ -12,7 +13,5 @@ set ball_1.speed.x to 1
 set ball_2.speed.x to -1
 
 # SOLUTION
-
 wait 30 frames
-
 set ball_1.speed.x to 10
