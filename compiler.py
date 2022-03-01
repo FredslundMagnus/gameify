@@ -30,7 +30,6 @@ class Block:
     def execute(self) -> None:
         while self.lines:
             line = self.lines.pop(0)
-            print(line)
             try:
                 if line.startswith("wait") and line.endswith("frames"):
                     frames = int(line.split(' ')[1])
