@@ -3,11 +3,12 @@ from imports import *
 
 
 class Ball(GameObject):
-    def __init__(self, center: tuple[float, float], radius: float, speed: tuple[float, float] = (0, 0), color: Color = Colors.red) -> None:
+    def __init__(self, center: tuple[float, float], radius: float, speed: tuple[float, float] = (0, 0), color: Color = Colors.red, weight: float = 1) -> None:
         self.center = XandY(*center)
         self.radius = radius
         self.color = color
         self.speed = XandY(*speed)
+        self.weight = weight
 
     def draw(self, screen: Screen):
         screen.draw_circle(Colors.white, self.center, self.radius)
@@ -17,11 +18,10 @@ class Ball(GameObject):
     def rect(self) -> Rect:
         return Rect(self.center.x - self.radius, self.center.y - self.radius, self.radius*2, self.radius*2)
 
-    def update(self, platforms: list[Platform]):
+    def update(self, platforms: list[Platform], goals: list[Goal]):
         self.speed.y += self.gravity
         self.center = XandY(self.center.x + self.speed.x, self.center.y + self.speed.y)
         for platform in platforms:
-
             if not platform.rect.colliderect(self.rect):
                 continue
             if platform.rect.top >= self.center.y:
@@ -32,6 +32,12 @@ class Ball(GameObject):
                 self.speed = XandY(abs(self.speed.x), self.speed.y)
             if platform.rect.bottom <= self.center.y:
                 self.speed = XandY(self.speed.x, abs(self.speed.y))
+        for goal in goals:
+            if goal.rect.colliderect(self.rect):
+                print("YOU WIN!") 
+                # quit()
+                
+
 
 
 class Platform(GameObject):
@@ -92,10 +98,33 @@ class BallGame(Game):
         for ball in self.balls:
             ball.draw(screen)
 
+    def ball_collisions(self):
+        for i in range(len(self.balls)):
+            ball = self.balls[i]
+            for j in range(i + 1, len(self.balls)):
+                ball2 = self.balls[j]
+                if not ball.rect.colliderect(ball2):
+                    continue
+                pos_dif = (ball.center.x - ball2.center.x, ball.center.y - ball2.center.y)
+                len_pos = (pos_dif[0] ** 2 + pos_dif[1] ** 2) ** (1/2)
+                pos_dif_norm = (pos_dif[0] / len_pos, pos_dif[1] / len_pos)
+                speed_dif = (ball.speed.x - ball2.speed.x, ball.speed.y - ball2.speed.y)
+                speed_proj = speed_dif[0] * pos_dif_norm[0] + speed_dif[1] * pos_dif_norm[1]
+                relative_weight = ball.weight / ball2.weight
+                
+                ball.speed.x -= 2 * pos_dif_norm[0] * speed_proj / (relative_weight + 1)
+                ball.speed.y -= 2 * pos_dif_norm[1] * speed_proj / (relative_weight + 1)
+                ball2.speed.x += 2 * pos_dif_norm[0] * speed_proj * relative_weight / (relative_weight + 1)
+                ball2.speed.y += 2 * pos_dif_norm[1] * speed_proj * relative_weight / (relative_weight + 1)
+
+
+
+
     def update(self) -> None:
         for platform in self.platforms:
             platform.update()
         for goal in self.goals:
             goal.update()
         for ball in self.balls:
-            ball.update(self.platforms)
+            ball.update(self.platforms, self.goals)
+        self.ball_collisions()
