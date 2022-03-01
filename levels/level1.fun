@@ -1,7 +1,7 @@
 type BallGame
 
 # SETUP
-let ball_1 be Ball((150, 120), 20, weight=10)
+let ball_1 be Ball((150, 120), 20, weight=2)
 let ball_2 be Ball((100, 120), 20)
 let platforms_1 be Platform(0, 300, 400, 20)
 let platforms_2 be Platform(40, 50, 20, 400)
