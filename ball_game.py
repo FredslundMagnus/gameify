@@ -21,18 +21,17 @@ class Ball(GameObject):
         self.speed.y += self.gravity
         self.center = XandY(self.center.x + self.speed.x, self.center.y + self.speed.y)
         for platform in platforms:
+
             if not platform.rect.colliderect(self.rect):
                 continue
-
-            if platform.rect.top <= self.rect.bottom:
+            if platform.rect.top >= self.center.y:
                 self.speed = XandY(self.speed.x, -abs(self.speed.y))
-            # if platform.rect.top >= self.rect.bottom:
-            #     self.speed = XandY(self.speed.x, abs(self.speed.y))
-
-            # if platform.rect.left <= self.rect.right:
-            #     self.speed = XandY(-abs(self.speed.x), self.speed.y)
-            # if platform.rect.left >= self.rect.right:
-            #     self.speed = XandY(abs(self.speed.x), self.speed.y)
+            if platform.rect.left >= self.center.x:
+                self.speed = XandY(-abs(self.speed.x), self.speed.y)
+            if platform.rect.right <= self.center.x:
+                self.speed = XandY(abs(self.speed.x), self.speed.y)
+            if platform.rect.bottom <= self.center.y:
+                self.speed = XandY(self.speed.x, abs(self.speed.y))
 
 
 class Platform(GameObject):
