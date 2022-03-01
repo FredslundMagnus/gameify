@@ -3,47 +3,67 @@ from ball_game import BallGame
 from game import Game
 
 
+class Executer:
+    blocks: list[list[Block]] = [[]]
+
+    @staticmethod
+    def add(block: Block, frame: int = 0) -> None | Block:
+        for _ in range(frame + 1 - len(Executer.blocks)):
+            Executer.blocks.append([])
+        Executer.blocks[frame].append(block)
+        return block
+
+    def execute() -> None:
+        if not Executer.blocks:
+            return
+        while Executer.blocks[0]:
+            block = Executer.blocks[0].pop(0)
+            block.execute()
+        Executer.blocks.pop(0)
+
+
+class Block:
+    def __init__(self, lines: list[str], scope: dict[str, object]) -> None:
+        self.lines = lines
+        self.scope = scope
+
+    def execute(self) -> None:
+        while self.lines:
+            line = self.lines.pop(0)
+            print(line)
+            try:
+                if line.startswith("wait") and line.endswith("frames"):
+                    frames = int(line.split(' ')[1])
+                    return Executer.add(self, frames)
+                elif "let" in line and "be" in line:
+                    _, name, _, *values = line.split(" ")
+                    value = eval(" ".join(values), self.scope)
+                    self.scope[name] = value
+                elif "set" in line and "to" in line:
+                    _, part, _, *values = line.split(" ")
+                    value = eval(" ".join(values), self.scope)
+                    parts = part.split(".")
+                    obj = self.scope[parts[0]]
+                    for attribute in parts[1:-1]:
+                        obj = obj.__getattribute__(attribute)
+                    setter = parts[-1]
+                    obj.__setattr__(setter, value)
+                else:
+                    print(self.frame, line)
+            except Exception as e:
+                raise Exception(f"{e}\nYou have an error in the line:\n{line}")
+
+
 class Code:
     game: Game
 
     def __init__(self, type: str, lines: list[str]) -> None:
         if type == "BallGame":
             self.game = BallGame(640, 480)
-        self.lines = lines
-        self.frame = 0
-        self.next = 0
-        self.elements = self.game.elements
-        self.game.objects = self.elements
+        Executer.add(Block(lines, self.game.objects))
 
     def execute(self) -> None:
-        if self.frame == self.next:
-            while self.lines:
-                line, self.lines = self.lines[0], self.lines[1:]
-                try:
-                    if line.startswith("wait") and line.endswith("frames"):
-                        frames = int(line.split(' ')[1])
-                        self.next += frames
-                        break
-                    elif "let" in line and "be" in line:
-                        _, name, _, *values = line.split(" ")
-                        value = eval(" ".join(values), self.elements)
-                        self.elements[name] = value
-                    elif "set" in line and "to" in line:
-                        _, part, _, *values = line.split(" ")
-                        value = eval(" ".join(values), self.elements)
-                        parts = part.split(".")
-                        obj = self.elements[parts[0]]
-                        for attribute in parts[1:-1]:
-                            obj = obj.__getattribute__(attribute)
-                        setter = parts[-1]
-                        obj.__setattr__(setter, value)
-                    else:
-                        print(self.frame, line)
-                except Exception as e:
-                    raise Exception(f"{e}\nYou have an error in the line:\n{line}")
-        self.frame += 1
-        if self.frame > self.next:
-            self.next = self.frame
+        Executer.execute()
 
 
 def compile(file_name: str) -> Code:
