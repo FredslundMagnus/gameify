@@ -4,31 +4,47 @@ from game import Game
 
 
 def findBloc(theLines: list[str]) -> tuple[list[str], str]:
-    lines = []
+    block = []
+    state = 1
     while True:
         temp = theLines.pop(0)
-        if temp == "}":
-            break
-        lines.append(temp)
-    return lines, temp
+        if temp.startswith("}"):
+            state -= 1
+        if state == 0:
+            return block, temp
+        if temp.endswith("{"):
+            state += 1
+        block.append(temp)
 
 
 class Executer:
     blocks: list[list[Block]] = [[]]
+    temp: list[tuple[Block, int]] = []
 
     @staticmethod
-    def add(block: Block, frame: int = 0) -> None | Block:
+    def real_add(block: Block, frame: int) -> None:
         for _ in range(frame + 1 - len(Executer.blocks)):
             Executer.blocks.append([])
-        Executer.blocks[frame].append(block)
-        return block
+        Executer.blocks[frame].insert(0, block)
 
+    @staticmethod
+    def add(block: Block, frame: int = 0) -> None:
+        Executer.temp.append((block, frame))
+
+    @staticmethod
+    def finalise() -> None:
+        for block, frame in reversed(Executer.temp):
+            Executer.real_add(block, frame)
+        Executer.temp = []
+
+    @staticmethod
     def execute() -> None:
         if not Executer.blocks:
             return
         while Executer.blocks[0]:
             block = Executer.blocks[0].pop(0)
             block.execute()
+            Executer.finalise()
         Executer.blocks.pop(0)
 
 
@@ -38,11 +54,11 @@ class Block:
         self.scope = scope
 
     def execute(self) -> None:
-        while self.lines:
+        while self.lines and not self.scope["must_break"]:
             line = self.lines.pop(0)
             try:
                 if line.startswith("wait") and line.endswith("frames"):
-                    frames = int(line.split(' ')[1])
+                    frames = int(eval(" ".join(line.split(" ")[1:-1]), self.scope))
                     return Executer.add(self, frames)
                 elif "let" in line and "be" in line:
                     _, name, _, *values = line.split(" ")
@@ -58,25 +74,38 @@ class Block:
                     setter = parts[-1]
                     obj.__setattr__(setter, value)
                 elif "after" in line and "frames" in line and line.endswith("{"):
-                    n = int(eval(line.split(" ")[1], self.scope))
+                    n = int(eval(" ".join(line.split(" ")[1:-2]), self.scope))
                     lines, _ = findBloc(self.lines)
                     Executer.add(Block(lines, self.scope.copy()), frame=n)
                 elif "every" in line and "frames" in line and line.endswith("{"):
-                    n = int(eval(line.split(" ")[1], self.scope))
+                    n = int(eval(" ".join(line.split(" ")[1:-2]), self.scope))
                     lines, _ = findBloc(self.lines)
                     scope = self.scope.copy()
                     Executer.add(Block(lines, scope), frame=n)  # frame=0, hvis man vil have den gør det første gang også
                     block = [f"every {n} frames "+"{", *(lines.copy()), "}"]
                     Executer.add(Block(block, scope), frame=n)
                 elif "loop" in line and "times" in line and line.endswith("{"):
-                    n = int(eval(line.split(" ")[1], self.scope))
+                    n = int(eval(" ".join(line.split(" ")[1:-2]), self.scope))
                     lines, _ = findBloc(self.lines)
                     for _ in range(n):
                         Executer.add(Block(lines.copy(), self.scope))
                 elif line.startswith("do"):
                     eval(line[3:], self.scope)
+                elif line.startswith("if") and line.endswith("{"):
+                    condition = bool(eval(" ".join(line.split(" ")[1:-1]), self.scope))
+                    true_lines, rest = findBloc(self.lines)
+                    false_exists = rest.startswith("}") and "else" in rest and line.endswith("{")
+                    if false_exists:
+                        false_lines, _ = findBloc(self.lines)
+
+                    if condition:
+                        Executer.add(Block(true_lines, self.scope))
+                    elif false_exists:
+                        Executer.add(Block(false_lines, self.scope))
+                elif line == 'break':
+                    self.scope["must_break"] = True
                 else:
-                    print(line, self.scope)
+                    print(line)
             except Exception as e:
                 raise Exception(f"{e}\nYou have an error in the line:\n{line}")
 
@@ -87,7 +116,10 @@ class Code:
     def __init__(self, type: str, lines: list[str]) -> None:
         if type == "BallGame":
             self.game = BallGame(640, 480)
-        Executer.add(Block(lines, self.game.objects))
+        scope = self.game.objects
+        scope["must_break"] = False
+        Executer.add(Block(lines, scope))
+        Executer.finalise()
 
     def execute(self) -> None:
         Executer.execute()

@@ -27,13 +27,31 @@ loop 4 times {
     do print("Hej")
 }
 
-wait 80 frames
+wait 4*20 frames
 
 let x be 100
 every 20 frames {
-    do print(x)
     let x be x-1
+
+    if x%2==1 {
+        do print(x, "x is odd")
+    } else {
+        do print(x, "x is even")
+    }
+
+    do print(x, "before")
+    if x==80 {
+        do print("I should break")
+        break
+    }
+    do print(x, "after")
 }
+
+do print("This runs!")
+
+wait 20 * 25 frames
+
+do print("This stil runs!")
 
 set platforms_2.speed.x to 1
 # SOLUTION
@@ -48,7 +66,7 @@ set platforms_2.speed.x to 1
 # print(3)
 
 # make fib(n) {
-#     if n == 1 or n == 2{
+#     if n == 1 or n == 2 {
 #         return 1
 #     } else {
 #         return fib(n-1) + fib(n-2)
