@@ -19,11 +19,12 @@ class Ball(GameObject):
         return Rect(self.center.x - self.radius, self.center.y - self.radius, self.radius*2, self.radius*2)
 
     def update(self, platforms: list[Platform], goals: list[Goal]):
-        self.speed.y += self.gravity
         self.center = XandY(self.center.x + self.speed.x, self.center.y + self.speed.y)
+        collides = False
         for platform in platforms:
             if not platform.rect.colliderect(self.rect):
                 continue
+            collides = True
             if platform.rect.top >= self.center.y:
                 self.speed = XandY(self.speed.x, -abs(self.speed.y))
             if platform.rect.left >= self.center.x:
@@ -32,6 +33,8 @@ class Ball(GameObject):
                 self.speed = XandY(abs(self.speed.x), self.speed.y)
             if platform.rect.bottom <= self.center.y:
                 self.speed = XandY(self.speed.x, abs(self.speed.y))
+        if not collides:
+            self.speed.y += self.gravity
         for goal in goals:
             if goal.rect.colliderect(self.rect):
                 print("YOU WIN!") 
