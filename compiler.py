@@ -2,7 +2,7 @@ from __future__ import annotations
 from ball_game import BallGame
 from game import Game
 from random import random
-
+from utils import name, value, _matcher, clean
 must_break = "must break"
 return_value = "return value"
 block_not_executed = (..., ...)
@@ -51,10 +51,10 @@ class Executer:
 
     @staticmethod
     def run(block: Block) -> Block | object:
-        block.next = block.execute()
-        if block.next == DONE:
+        result = block.execute()
+        if result == DONE:
             return block.stack.run()
-        return block.next
+        return result
 
     @staticmethod
     def execute() -> None:
@@ -71,11 +71,17 @@ class Block:
         self.lines = lines
         self.scope = scope
         self.stack = stack
-        self.next: Block | object = block_not_executed
 
-    def value(self, words: list[str], as_type: type = ...) -> object:
+    def value(self, words: list[str], as_type: type = value) -> object:
         tmp = eval(" ".join(words), self.scope)
-        if as_type != ...:
+        if as_type != value:
+            tmp = as_type(tmp)
+        return tmp
+
+    def value2(self, text: str, as_type: type = value) -> object:
+        print(text)
+        tmp = eval(text, self.scope)
+        if as_type != value:
             tmp = as_type(tmp)
         return tmp
 
@@ -83,6 +89,10 @@ class Block:
         while self.lines and not self.scope[must_break]:
             line = self.lines.pop(0)
             words = line.split(" ")
+            _matches_ = []
+            def match(*shape: str | type | list[type]): return _matcher(shape, _matches_, words, self.value2)
+            def matches() -> object | list[object]: return clean(_matches_)
+
             try:
                 if words[0] == "wait" and words[-1] == "frames":
                     frames = self.value(words[1:-1], int)
@@ -95,19 +105,19 @@ class Block:
                     return None
 
                 elif words[0] == "let" and words[2] == "be":
-                    _, name, _, *values = words
-                    value = eval(" ".join(values), self.scope)
-                    self.scope[name] = value
+                    _, _name, _, *values = words
+                    _value = eval(" ".join(values), self.scope)
+                    self.scope[_name] = _value
 
                 elif words[0] == "set" and words[2] == "to":
                     _, part, _, *values = words
-                    value = eval(" ".join(values), self.scope)
+                    _value = eval(" ".join(values), self.scope)
                     parts = part.split(".")
                     obj = self.scope[parts[0]]
                     for attribute in parts[1:-1]:
                         obj = obj.__getattribute__(attribute)
                     setter = parts[-1]
-                    obj.__setattr__(setter, value)
+                    obj.__setattr__(setter, _value)
 
                 elif words[0] == "after" and words[-2] == "frames" and words[-1] == "{":
                     n = int(eval(" ".join(words[1:-2]), self.scope))
