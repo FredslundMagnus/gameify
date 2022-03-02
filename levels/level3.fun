@@ -32,7 +32,20 @@ loop 3 times {
     if True {
         break
     }
+    do print("Newer reached")
 }
+do print("Reached")
+
+loop 3 times {
+    do print("Hallo1")
+    wait 60 frames
+    do print("Hallo")
+    if True {
+        break
+    }
+    do print("Newer reached")
+}
+do print("Reached")
 
 let y be 8
 loop {

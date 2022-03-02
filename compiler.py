@@ -2,40 +2,32 @@ from __future__ import annotations
 from ball_game import BallGame
 from game import Game
 from random import random
-from utils import name, value, _matcher, clean
-must_break = "must break"
-return_value = "return value"
-block_not_executed = (..., ...)
-DONE = (...,)
+from utils import name, value, _matcher, clean, findBloc, BREAK, DONE
 
 
 class Stack:
     def __init__(self) -> None:
         self.stack = []
 
-    def add(self, block: Block) -> Stack:
-        self.stack.append(block)
+    def add(self, block: Block, catch_break: bool = False) -> Stack:
+        self.stack.append((block, catch_break))
         return self
 
     def run(self) -> Stack:
         if not self.stack:
             return None
-        block = self.stack.pop()
+        block, _ = self.stack.pop()
         return Executer.run(block)
 
-
-def findBloc(theLines: list[str]) -> tuple[list[str], str]:
-    block = []
-    state = 1
-    while True:
-        temp = theLines.pop(0)
-        if temp.startswith("}"):
-            state -= 1
-        if state == 0:
-            return block, temp
-        if temp.endswith("{"):
-            state += 1
-        block.append(temp)
+    def catch_break(self) -> Stack:
+        if not self.stack:
+            return None
+        block, catch_break = self.stack.pop()
+        while not catch_break:
+            if not self.stack:
+                return None
+            block, catch_break = self.stack.pop()
+        return Executer.run(block)
 
 
 class Executer:
@@ -54,6 +46,8 @@ class Executer:
         result = block.execute()
         if result == DONE:
             return block.stack.run()
+        if result == BREAK:
+            return block.stack.catch_break()
         return result
 
     @staticmethod
@@ -79,14 +73,13 @@ class Block:
         return tmp
 
     def value2(self, text: str, as_type: type = value) -> object:
-        print(text)
         tmp = eval(text, self.scope)
         if as_type != value:
             tmp = as_type(tmp)
         return tmp
 
     def execute(self) -> Block | object:
-        while self.lines and not self.scope[must_break]:
+        while self.lines:
             line = self.lines.pop(0)
             words = line.split(" ")
             _matches_ = []
@@ -94,24 +87,21 @@ class Block:
             def matches() -> object | list[object]: return clean(_matches_)
 
             try:
-                if words[0] == "wait" and words[-1] == "frames":
-                    frames = self.value(words[1:-1], int)
-                    return Executer.add(self, frames)
+                if match("wait", [int], "frames"):
+                    return Executer.add(self, matches())
 
-                elif words[0] == "return":
-                    return self.value(words[1:])
+                elif match("return", [value]):
+                    return matches()
 
-                elif words[0] == 'break':
-                    return None
+                elif match("break"):
+                    return BREAK
 
-                elif words[0] == "let" and words[2] == "be":
-                    _, _name, _, *values = words
-                    _value = eval(" ".join(values), self.scope)
+                elif match("let", name, "be", [value]):
+                    _name, _value = matches()
                     self.scope[_name] = _value
 
-                elif words[0] == "set" and words[2] == "to":
-                    _, part, _, *values = words
-                    _value = eval(" ".join(values), self.scope)
+                elif match("set", name, "to", [value]):
+                    part, _value = matches()
                     parts = part.split(".")
                     obj = self.scope[parts[0]]
                     for attribute in parts[1:-1]:
@@ -119,38 +109,38 @@ class Block:
                     setter = parts[-1]
                     obj.__setattr__(setter, _value)
 
-                elif words[0] == "after" and words[-2] == "frames" and words[-1] == "{":
-                    n = int(eval(" ".join(words[1:-2]), self.scope))
+                elif match("after", [int], "frames", "{"):
+                    n = matches()
                     lines, _ = findBloc(self.lines)
                     Executer.add(Block(lines, self.scope.copy(), Stack()), frame=n)
 
-                elif words[0] == "every" and words[-2] == "frames" and words[-1] == "{":
-                    n = self.value(words[1:-2], int)
+                elif match("every", [int], "frames", "{"):
+                    n = matches()
                     lines, _ = findBloc(self.lines)
                     scope = self.scope.copy()
                     Executer.add(Block(lines, scope, Stack()), frame=n)  # frame=0, hvis man vil have den gør det første gang også
                     block = [f"every {n} frames "+"{", *(lines.copy()), "}"]
                     Executer.add(Block(block, scope, Stack()), frame=n)
 
-                elif words[0] == "loop" and words[-2] == "times" and words[-1] == "{":
-                    n = self.value(words[1:-2], int)
+                elif match("loop", [int], "times", "{"):
+                    n = matches()
                     lines, _ = findBloc(self.lines)
                     if n > 0:
                         block = [*lines, f"loop {n-1} times "+"{", *lines, "}"]
-                        return Executer.run(Block(lines, self.scope, self.stack.add(self)))
+                        return Executer.run(Block(block, self.scope, self.stack.add(self, catch_break=True)))
 
-                elif words[0] == "loop" and words[1] == "{":
+                elif match("loop", "{"):
                     lines, _ = findBloc(self.lines)
                     block = [*lines, "loop {", *lines, "}"]
-                    return Executer.run(Block(lines, self.scope, self.stack.add(self)))
+                    return Executer.run(Block(block, self.scope, self.stack.add(self, catch_break=True)))
 
-                elif words[0] == "do":
-                    self.value(words[1:])
+                elif match("do", [value]):
+                    pass
 
-                elif words[0] == "if" and words[-1] == "{":
-                    condition = self.value(words[1:-1], bool)
+                elif match("if", [bool], "{"):
+                    condition = matches()
                     true_lines, rest = findBloc(self.lines)
-                    false_exists = rest.startswith("}") and "else" in rest and line.endswith("{")
+                    false_exists = rest == "} else {"
                     if false_exists:
                         false_lines, _ = findBloc(self.lines)
                     if condition:
@@ -173,8 +163,6 @@ class Code:
         if type == "BallGame":
             self.game = BallGame(640, 480)
         scope = self.game.objects
-        scope[must_break] = False
-        scope[return_value] = block_not_executed
         scope["random"] = random
         Executer.add(Block(lines, scope, Stack()))
 

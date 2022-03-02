@@ -36,7 +36,7 @@ def _matcher(shape: list[str | type | list[type]], _matches_: list[object], word
             return False
         _matches_.extend(temp)
         return True
-    print(temp)
+
     # In case there was a list
     temp2 = []
     for j in range(1, len(words)+1):
@@ -59,7 +59,6 @@ def _matcher(shape: list[str | type | list[type]], _matches_: list[object], word
                 temp2.append(valuefy(string, element))
 
             _matches_.extend(temp + list(reversed(temp2)))
-            print(_matches_)
             return True
 
 
@@ -70,3 +69,25 @@ def clean(li: list[object]) -> list[object] | object:
     if len(li) == 0:
         raise Exception("You have no values to get")
     return li[0] if len(li) == 1 else li
+
+
+def findBloc(theLines: list[str]) -> tuple[list[str], str]:
+    block = []
+    state = 1
+    while True:
+        temp = theLines.pop(0)
+        if temp.startswith("}"):
+            state -= 1
+        if state == 0:
+            return block, temp
+        if temp.endswith("{"):
+            state += 1
+        block.append(temp)
+
+
+class BREAK:
+    pass
+
+
+class DONE:
+    pass
