@@ -1,6 +1,7 @@
 from __future__ import annotations
 from ball_game import BallGame
 from game import Game
+from random import random
 
 
 def findBloc(theLines: list[str]) -> tuple[list[str], str]:
@@ -29,13 +30,21 @@ class Executer:
 
     @staticmethod
     def add(block: Block, frame: int = 0) -> None:
-        Executer.temp.append((block, frame))
+        # Executer.temp.append((block, frame))
+        for _ in range(frame + 1 - len(Executer.blocks)):
+            Executer.blocks.append([])
+        Executer.blocks[frame].append(block)
+
+    @staticmethod
+    def run(block: Block) -> None:
+        block.execute()
 
     @staticmethod
     def finalise() -> None:
-        for block, frame in reversed(Executer.temp):
-            Executer.real_add(block, frame)
-        Executer.temp = []
+        pass
+        # for block, frame in reversed(Executer.temp):
+        #     Executer.real_add(block, frame)
+        # Executer.temp = []
 
     @staticmethod
     def execute() -> None:
@@ -88,7 +97,17 @@ class Block:
                     n = int(eval(" ".join(line.split(" ")[1:-2]), self.scope))
                     lines, _ = findBloc(self.lines)
                     for _ in range(n):
-                        Executer.add(Block(lines.copy(), self.scope))
+                        Executer.run(Block(lines.copy(), self.scope))
+                        if self.scope["must_break"] == True:
+                            self.scope["must_break"] = False
+                            break
+                elif "loop" in line and line.endswith("{"):
+                    lines, _ = findBloc(self.lines)
+                    while True:
+                        Executer.run(Block(lines.copy(), self.scope))
+                        if self.scope["must_break"] == True:
+                            self.scope["must_break"] = False
+                            break
                 elif line.startswith("do"):
                     eval(line[3:], self.scope)
                 elif line.startswith("if") and line.endswith("{"):
@@ -99,9 +118,9 @@ class Block:
                         false_lines, _ = findBloc(self.lines)
 
                     if condition:
-                        Executer.add(Block(true_lines, self.scope))
+                        Executer.run(Block(true_lines, self.scope))
                     elif false_exists:
-                        Executer.add(Block(false_lines, self.scope))
+                        Executer.run(Block(false_lines, self.scope))
                 elif line == 'break':
                     self.scope["must_break"] = True
                 else:
@@ -118,6 +137,7 @@ class Code:
             self.game = BallGame(640, 480)
         scope = self.game.objects
         scope["must_break"] = False
+        scope["random"] = random
         Executer.add(Block(lines, scope))
         Executer.finalise()
 

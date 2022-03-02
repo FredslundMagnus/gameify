@@ -27,6 +27,22 @@ loop 4 times {
     do print("Hej")
 }
 
+loop 3 times {
+    do print("Hallo")
+    if True {
+        break
+    }
+}
+
+let y be 8
+loop {
+    let y be y-1
+    do print("kat")
+    if y==2 {
+        break
+    }
+}
+
 wait 4*20 frames
 
 let x be 100
