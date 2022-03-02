@@ -31,17 +31,6 @@ set platforms_3.speed.x to speed
 set platforms_4.speed.x to speed
 set platforms_5.speed.x to speed
 
-after 1 frames {
-    every 200 frames {
-        set platforms_0.speed.x to speed
-        set platforms_1.speed.x to speed
-        set platforms_2.speed.x to speed
-        set platforms_3.speed.x to speed
-        set platforms_4.speed.x to speed
-        set platforms_5.speed.x to speed
-    }
-}
-
 every 200 frames {
     set platforms_0.speed.x to -speed*199
     set platforms_1.speed.x to -speed*199
@@ -49,6 +38,13 @@ every 200 frames {
     set platforms_3.speed.x to -speed*199
     set platforms_4.speed.x to -speed*199
     set platforms_5.speed.x to -speed*199
+    wait 1 frames
+    set platforms_0.speed.x to speed
+    set platforms_1.speed.x to speed
+    set platforms_2.speed.x to speed
+    set platforms_3.speed.x to speed
+    set platforms_4.speed.x to speed
+    set platforms_5.speed.x to speed
 }
 
 
