@@ -90,9 +90,7 @@ class Executer:
 
     @staticmethod
     def run(block: Block) -> Block | object:
-        # print("before execute")
         _future = block.future
-        # print(str(_future))
         result = block.execute()
         if result == DONE:
             _value = block.stack.run()
@@ -110,18 +108,14 @@ class Executer:
             return
         while Executer.blocks[0]:
             block = Executer.blocks[0].pop(0)
-            # print("jjjjjjjjjjjjjjj", str(block))
             _future = block.future
-            # print("kkkkkkkkkkkkkkkkkkkkk", str(block), str(_future))
             result = block.execute()
-            # print("dsfgsdfgsdfffg", str(block), str(_future), str(result))
 
             if _future is not None:
-                if _future is result:
-                    return result
-                _future._value = result
-                # print(str(_future))
-            return result
+                if _future is not result:
+                    _future._value = result
+
+            # return result
         Executer.blocks.pop(0)
 
 
