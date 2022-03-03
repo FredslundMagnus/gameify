@@ -1,64 +1,22 @@
 type BallGame
 
 # SETUP
-let ball be Ball((60, 120), 30.2)
+let ball_1 be Ball((375, 250), 10, color=Colors.orange)
 
-let platforms_0 be Platform(-180, 300, 80, 20)
-let platforms_1 be Platform(20, 300, 80, 20)
-let platforms_2 be Platform(220, 300, 80, 20)
-let platforms_3 be Platform(420, 300, 80, 20)
-let platforms_4 be Platform(620, 300, 80, 20)
-let platforms_5 be Platform(820, 300, 80, 20)
+let platforms_1 be Platform(350, 279, 50, 20)
+let platforms_2 be Platform(400, 249, 20, 100)
+let platforms_3 be Platform(330, 249, 20, 100)
+let platforms_4 be Platform(352, 239, 13, 20)
+let platforms_5 be Platform(385, 239, 13, 20)
+set ball_1.speed.y to 3
 
-let goal be Goal(550, 110, 50, 50)
-
-let go_right be random() < 0.5
-
-if go_right {
-    let speed be 1
-} else {
-    let speed be -1
-}
-
-let go_right_2 be True if go_right else False
-
-do print(go_right, go_right_2)
-
-set platforms_0.speed.x to speed
-set platforms_1.speed.x to speed
-set platforms_2.speed.x to speed
-set platforms_3.speed.x to speed
-set platforms_4.speed.x to speed
-set platforms_5.speed.x to speed
-
-every 200 frames {
-    set platforms_0.speed.x to -speed*199
-    set platforms_1.speed.x to -speed*199
-    set platforms_2.speed.x to -speed*199
-    set platforms_3.speed.x to -speed*199
-    set platforms_4.speed.x to -speed*199
-    set platforms_5.speed.x to -speed*199
-    wait 1 frames
-    set platforms_0.speed.x to speed
-    set platforms_1.speed.x to speed
-    set platforms_2.speed.x to speed
-    set platforms_3.speed.x to speed
-    set platforms_4.speed.x to speed
-    set platforms_5.speed.x to speed
-}
-
-
-
+let goal be Goal(350, 300, 50, 50)
 
 # SOLUTION
+wait 20 frames
+set ball_1.speed.x to 2
+wait 100 frames
+set ball_1.speed.x to 7
+set ball_1.speed.y to -6
 
-# Du skal bruge go_right i din løsning
-do print(go_right)
-
-if go_right {
-    set ball.speed.x to 1
-} else {
-    set ball.speed.x to 2
-    wait 60 frames
-    set ball.speed.x to 1
-}
+ 
