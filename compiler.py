@@ -5,6 +5,22 @@ from random import random
 from utils import name, value, _matcher, clean, findBloc, BREAK, DONE
 
 
+class Function:
+    def __init__(self, name: str, parameters: list[str], lines: list[str], scope: dict[str, object]) -> None:
+        self.name = name
+        self.parameters = parameters
+        self.lines = lines
+        self.scope = scope
+        self.scope[self.name] = self
+
+    def __call__(self, *args: object) -> object:
+        if len(args) != len(self.parameters):
+            raise Exception("You used a wrong number of arguments!")
+        for _name, _value in zip(self.parameters, args):
+            self.scope[_name] = _value
+        return Executer.run(Block(self.lines.copy(), self.scope.copy(), Stack()))
+
+
 class Stack:
     def __init__(self) -> None:
         self.stack = []
@@ -30,6 +46,34 @@ class Stack:
         return Executer.run(block)
 
 
+class Future:
+    def __init__(self) -> None:
+        self._value = ...
+
+    def __repr__(self) -> str:
+        return f"Future(done={self.isDone}{', value='+str(self.value) if self.value != ... else ''})"
+
+    @property
+    def value(self) -> object:
+        if self._value is ...:
+            return ...
+        if type(self._value) is Future:
+            return self._value._value
+        return self._value
+
+    @property
+    def done(self) -> bool:
+        return self.isDone
+
+    @property
+    def isDone(self) -> bool:
+        if self._value is ...:
+            return False
+        if type(self._value) is Future:
+            return self._value.isDone
+        return True
+
+
 class Executer:
     blocks: list[list[Block]] = [[]]
     temp: list[tuple[Block, int]] = []
@@ -39,16 +83,26 @@ class Executer:
         for _ in range(frame + 1 - len(Executer.blocks)):
             Executer.blocks.append([])
         Executer.blocks[frame].append(block)
-        return block
+        if block.future is None:
+            block.future = Future()
+        # print(Executer.blocks)
+        return block.future
 
     @staticmethod
     def run(block: Block) -> Block | object:
+        # print("before execute")
+        _future = block.future
+        # print(str(_future))
         result = block.execute()
         if result == DONE:
-            return block.stack.run()
-        if result == BREAK:
-            return block.stack.catch_break()
-        return result
+            _value = block.stack.run()
+        elif result == BREAK:
+            _value = block.stack.catch_break()
+        else:
+            _value = result
+        if _future is not None:
+            _future._value = _value
+        return _value
 
     @staticmethod
     def execute() -> None:
@@ -56,7 +110,18 @@ class Executer:
             return
         while Executer.blocks[0]:
             block = Executer.blocks[0].pop(0)
-            block.execute()
+            # print("jjjjjjjjjjjjjjj", str(block))
+            _future = block.future
+            # print("kkkkkkkkkkkkkkkkkkkkk", str(block), str(_future))
+            result = block.execute()
+            # print("dsfgsdfgsdfffg", str(block), str(_future), str(result))
+
+            if _future is not None:
+                if _future is result:
+                    return result
+                _future._value = result
+                # print(str(_future))
+            return result
         Executer.blocks.pop(0)
 
 
@@ -65,14 +130,13 @@ class Block:
         self.lines = lines
         self.scope = scope
         self.stack = stack
+        self.future: None | Future = None
 
-    def value(self, words: list[str], as_type: type = value) -> object:
-        tmp = eval(" ".join(words), self.scope)
-        if as_type != value:
-            tmp = as_type(tmp)
-        return tmp
+    def __repr__(self) -> str:
+        return f"Block(future={self.future}, lines={self.lines})"
+        # return f"Block(lines={self.lines}, stack={self.stack})"
 
-    def value2(self, text: str, as_type: type = value) -> object:
+    def value(self, text: str, as_type: type = value) -> object:
         tmp = eval(text, self.scope)
         if as_type != value:
             tmp = as_type(tmp)
@@ -83,7 +147,7 @@ class Block:
             line = self.lines.pop(0)
             words = line.split(" ")
             _matches_ = []
-            def match(*shape: str | type | list[type]): return _matcher(shape, _matches_, words, self.value2)
+            def match(*shape: str | type | list[type]): return _matcher(shape, _matches_, words, self.value)
             def matches() -> object | list[object]: return clean(_matches_)
 
             try:
@@ -92,6 +156,9 @@ class Block:
 
                 elif match("return", [value]):
                     return matches()
+
+                elif match("return"):
+                    return None
 
                 elif match("break"):
                     return BREAK
@@ -148,7 +215,30 @@ class Block:
                     elif false_exists:
                         return Executer.run(Block(false_lines, self.scope, self.stack.add(self)))
 
+                elif match("make", [name], "{"):
+                    temp: tuple[str, str] = matches()[:-1].split("(")
+                    _name, _parameters = temp
+                    parameters = _parameters.replace(" ", "").split(",")
+                    print(_name, parameters,  "her")
+                    lines, _ = findBloc(self.lines)
+                    self.scope[_name] = Function(_name, parameters, lines, self.scope.copy())
+
+                elif match("await", [name], "as", name):
+                    _code, _name = matches()
+                    self.lines.insert(0, f"await {_name}")
+                    self.lines.insert(0, f"let {_name} be {_code}")
+
+                elif match("await", [name]):
+                    _name = matches()
+                    _future = self.value(_name)
+                    if _future.isDone:
+                        self.scope[_name] = _future.value
+                    else:
+                        self.lines.insert(0, f"await {_name}")
+                        self.lines.insert(0, f"wait 1 frames")
+
                 else:
+
                     print(line)
 
             except Exception as e:
@@ -164,7 +254,7 @@ class Code:
             self.game = BallGame(640, 480)
         scope = self.game.objects
         scope["random"] = random
-        Executer.add(Block(lines, scope, Stack()))
+        Executer.run(Block(lines, scope, Stack()))
 
     def execute(self) -> None:
         Executer.execute()
