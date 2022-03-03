@@ -13,3 +13,4 @@ let goal be Goal(550, 110, 50, 50)
 wait 60 frames
 set ball_1.speed.x to 2
 
+    
