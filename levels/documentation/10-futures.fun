@@ -59,7 +59,7 @@ await something(3) as value
 # value=3
 
 # Conclusion
-# We see that we now basiacally have removed our need to hande the futeres and have gotten 2 simple approaches:
+# We see that we now basiacally have removed our need to handle the futeres and have gotten 2 simple approaches:
 # We want to wait until something finishes:
 await something(3)
 # We want to wait until something finishes and get the result
