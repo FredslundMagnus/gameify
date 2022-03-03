@@ -4,8 +4,11 @@ from pygame.display import flip
 from ball_game import BallGame
 from pygame.event import get as events
 from compiler import compile, Code
+from sys import argv
 
 level = 1
+if len(argv) == 2:
+    level = int(argv[1])
 
 size = init()
 clock = Clock()
