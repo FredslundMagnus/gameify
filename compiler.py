@@ -213,7 +213,8 @@ class Block:
                     temp: tuple[str, str] = matches()[:-1].split("(")
                     _name, _parameters = temp
                     parameters = _parameters.replace(" ", "").split(",")
-                    print(_name, parameters,  "her")
+                    if parameters == [""]:
+                        parameters = []
                     lines, _ = findBloc(self.lines)
                     self.scope[_name] = Function(_name, parameters, lines, self.scope.copy())
 
