@@ -19,7 +19,8 @@ class Ball(GameObject):
         return Rect(self.center.x - self.radius, self.center.y - self.radius, self.radius*2, self.radius*2)
 
     def update(self, platforms: list[Platform], goals: list[Goal]):
-        self.center = XandY(self.center.x + max(min(self.speed.x, 10),-10), self.center.y + max(min(self.speed.y,10),-10))
+        self.speed.x, self.speed.y = max(min(self.speed.x, 10),-10), max(min(self.speed.y,10),-10)
+        self.center = XandY(self.center.x + self.speed.x, self.center.y + self.speed.y)
         collides = False
         for platform in platforms:
             if not platform.rect.colliderect(self.rect):
