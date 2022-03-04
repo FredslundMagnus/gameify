@@ -65,3 +65,10 @@ await something(3)
 # We want to wait until something finishes and get the result
 await something(3) as result
 # result=3
+
+# Perspective
+# These two statements are comparable to
+do something(3)
+# and
+let result be something(3)
+# if 'something' was a function that returned imidiately without any waiting.
