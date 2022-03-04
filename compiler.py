@@ -1,5 +1,6 @@
 from __future__ import annotations
 from ball_game import BallGame
+from maze_game import MazeGame
 from game import Game
 from random import random
 from utils import name, value, _matcher, clean, findBloc, BREAK, DONE
@@ -85,7 +86,6 @@ class Executer:
         Executer.blocks[frame].append(block)
         if block.future is None:
             block.future = Future()
-        # print(Executer.blocks)
         return block.future
 
     @staticmethod
@@ -114,6 +114,11 @@ class Executer:
             if _future is not None:
                 if _future is not result:
                     _future._value = result
+
+            if result == DONE:
+                block.stack.run()
+            elif result == BREAK:
+                block.stack.catch_break()
 
             # return result
         Executer.blocks.pop(0)
@@ -220,17 +225,20 @@ class Block:
 
                 elif match("await", [name], "as", name):
                     _code, _name = matches()
-                    self.lines.insert(0, f"await {_name}")
                     self.lines.insert(0, f"let {_name} be {_code}")
+                    self.lines.insert(1, f"await {_name}")
 
                 elif match("await", [name]):
                     _name = matches()
                     _future = self.value(_name)
+                    if "(" in _name:
+                        _name = "__temp_await__"
+                        self.scope[_name] = _future
                     if _future.isDone:
                         self.scope[_name] = _future.value
                     else:
                         self.lines.insert(0, f"await {_name}")
-                        self.lines.insert(0, f"wait 1 frames")
+                        self.lines.insert(0, "wait 1 frames")
 
                 else:
 
@@ -247,6 +255,8 @@ class Code:
     def __init__(self, type: str, lines: list[str]) -> None:
         if type == "BallGame":
             self.game = BallGame(640, 480)
+        if type == "MazeGame":
+            self.game = MazeGame(680, 520)
         scope = self.game.objects
         scope["random"] = random
         Executer.run(Block(lines, scope, Stack()))

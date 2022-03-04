@@ -91,3 +91,33 @@ class BREAK:
 
 class DONE:
     pass
+
+
+class Position:
+    def __init__(self, position: tuple[int, int]) -> None:
+        self.position = position
+
+    def __hash__(self):
+        return self.position.__hash__()
+
+    def __eq__(self, __o: object) -> bool:
+        return __o.__hash__() == self.__hash__()
+
+    @property
+    def left(self) -> Position:
+        return Position((self.position[0]-1, self.position[1]))
+
+    @property
+    def right(self) -> Position:
+        return Position((self.position[0]+1, self.position[1]))
+
+    @property
+    def up(self) -> Position:
+        return Position((self.position[0], self.position[1]-1))
+
+    @property
+    def down(self) -> Position:
+        return Position((self.position[0], self.position[1]+1))
+
+    def __repr__(self) -> str:
+        return str((self.position[0], 12-self.position[1]))
