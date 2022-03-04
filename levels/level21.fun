@@ -3,7 +3,6 @@ type MazeGame
 # SETUP
 let maze be Maze(2)
 let player be maze.player
-set player.speed to 5
 
 # SOLUTION
 loop 2 times {

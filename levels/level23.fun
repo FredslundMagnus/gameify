@@ -3,7 +3,6 @@ type MazeGame
 # SETUP
 let maze be Maze(4)
 let player be maze.player
-set player.speed to 5
 
 # SOLUTION
 make move(operation) {

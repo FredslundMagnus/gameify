@@ -3,7 +3,6 @@ type MazeGame
 # SETUP
 let maze be Maze(3)
 let player be maze.player
-set player.speed to 5
 
 # SOLUTION
 make up(n) {

@@ -3,7 +3,6 @@ type MazeGame
 # SETUP
 let maze be Maze()
 let player be maze.player
-set player.speed to 5
 
 # SOLUTION
 let visited be {player.position}
