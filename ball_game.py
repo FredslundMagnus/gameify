@@ -36,12 +36,6 @@ class Ball(GameObject):
                 self.speed = XandY(self.speed.x, abs(self.speed.y))
         if not collides:
             self.speed.y += self.gravity
-        for goal in goals:
-            if goal.rect.colliderect(self.rect):
-                self.speed.x = 0
-                self.speed.y = 0
-                print("YOU WIN!") 
-                # quit()
                 
 
 
@@ -60,9 +54,11 @@ class Platform(GameObject):
 
 
 class Goal(GameObject):
-    def __init__(self, left: float, top: float, width: float, height: float, speed: tuple[float, float] = (0, 0)) -> None:
+    def __init__(self, left: float, top: float, width: float, height: float, speed: tuple[float, float] = (0, 0), balls: int = 1) -> None:
         self.rect = Rect(left, top, width, height)
         self.speed = XandY(*speed)
+        self.balls_to_win = balls
+        self.collides = 0
 
     def draw(self, screen: Screen):
         n = 5
@@ -73,9 +69,18 @@ class Goal(GameObject):
                 color = Colors.gray.c800 if (x+y) % 2 else Colors.white
                 screen.draw_rect(color, Rect(left+x*width, top+y*height, width, height))
 
-    def update(self):
+    def update(self, balls: list[Ball]):
         self.rect = self.rect.move(self.speed.x, self.speed.y)
-
+        for ball in balls:
+            if ball.rect.colliderect(self.rect):
+                ball.speed.x = 0
+                ball.speed.y = 0
+                ball.center.x = -100
+                self.collides += 1
+                if self.collides >= self.balls_to_win:
+                    print("YOU WIN!") 
+                else:
+                    print("You just need to get " + str(self.balls_to_win - self.collides) + " more ball(s) into the goal to win!")
 
 class BallGame(Game):
     types = [Ball, Platform, Goal, Colors]
@@ -130,7 +135,7 @@ class BallGame(Game):
         for platform in self.platforms:
             platform.update()
         for goal in self.goals:
-            goal.update()
+            goal.update(balls=self.balls)
         for ball in self.balls:
             ball.update(self.platforms, self.goals)
         self.ball_collisions()
