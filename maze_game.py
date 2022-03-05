@@ -171,5 +171,5 @@ class MazeGame(Game):
             block.draw(screen)
         self.player.draw(screen)
 
-    def update(self) -> None:
+    def update(self, frame: int) -> None:
         self.player.update(self.goal)

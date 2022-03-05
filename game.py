@@ -1,5 +1,4 @@
 from __future__ import annotations
-from game_object import GameObject
 from screen import Screen
 
 
@@ -18,5 +17,5 @@ class Game:
     def draw(self, screen: Screen) -> None:
         pass
 
-    def update(self) -> None:
+    def update(self, frame: int) -> None:
         pass

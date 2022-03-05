@@ -14,7 +14,7 @@ size = init()
 clock = Clock()
 code: Code = compile(f"levels/level{level}.fun")
 game = code.game
-
+frame = 0
 while True:
     clock.tick(60)
     for e in events():
@@ -29,6 +29,7 @@ while True:
             code = compile(f"levels/level{level}.fun")
             game = code.game
     code.execute()
-    game.update()
+    game.update(frame)
     game.draw(game.screen)
     flip()
+    frame += 1

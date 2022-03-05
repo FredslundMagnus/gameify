@@ -127,7 +127,7 @@ class BallGame(Game):
                 ball2.speed.x += 2 * pos_dif_norm[0] * speed_proj * relative_weight / (relative_weight + 1)
                 ball2.speed.y += 2 * pos_dif_norm[1] * speed_proj * relative_weight / (relative_weight + 1)
 
-    def update(self) -> None:
+    def update(self, frame: int) -> None:
         for platform in self.platforms:
             platform.update()
         for goal in self.goals:
