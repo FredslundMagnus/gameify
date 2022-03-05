@@ -20,6 +20,11 @@ make move(action) {
     do visited.add(player.position)
 }
 
+make go_back() {
+    let last_action be stack.pop()
+    await last_action()
+}
+
 loop {
     if is_new(player.position.right) {
         await move(player.right)
@@ -37,6 +42,5 @@ loop {
         await move(player.left)
         continue
     }
-    let go_back be stack.pop()
     await go_back()
 }

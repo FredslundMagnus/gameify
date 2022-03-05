@@ -8,35 +8,31 @@ let player be maze.player
 let visited be {player.position}
 let stack be []
 
-make is_new(position) {
-    return position not in visited and maze.is_free(position)
-}
-
 loop {
-    if is_new(player.position.right) {
+    if player.position.right not in visited and maze.is_free(player.position.right) {
         await player.right()
         do stack.append(player.left)
         do visited.add(player.position)
         continue
     }
-    if is_new(player.position.up) {
+    if player.position.up not in visited and maze.is_free(player.position.up) {
         await player.up()
         do stack.append(player.down)
         do visited.add(player.position)
         continue
     } 
-    if is_new(player.position.down) {
+    if player.position.down not in visited and maze.is_free(player.position.down) {
         await player.down()
         do stack.append(player.up)
         do visited.add(player.position)
         continue
     }  
-    if is_new(player.position.left) {
+    if player.position.left not in visited and maze.is_free(player.position.left) {
         await player.left()
         do stack.append(player.right)
         do visited.add(player.position)
         continue
     }
-    let go_back be stack.pop()
-    await go_back()
+    let last_action be stack.pop()
+    await last_action()
 }
