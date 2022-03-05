@@ -89,6 +89,10 @@ class BREAK:
     pass
 
 
+class CONTINUE:
+    pass
+
+
 class DONE:
     pass
 

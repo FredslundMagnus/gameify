@@ -3,7 +3,7 @@ from ball_game import BallGame
 from maze_game import MazeGame
 from game import Game
 from random import random
-from utils import name, value, _matcher, clean, findBloc, BREAK, DONE
+from utils import CONTINUE, name, value, _matcher, clean, findBloc, BREAK, DONE
 
 
 class Function:
@@ -45,6 +45,19 @@ class Stack:
                 return None
             block, catch_break = self.stack.pop()
         return Executer.run(block)
+
+    def catch_continue(self, last_block) -> Stack:
+        if not self.stack:
+            return None
+        block, catch_break = self.stack.pop()
+        while not catch_break:
+            if not self.stack:
+                return None
+            last_block = block
+            block, catch_break = self.stack.pop()
+        while last_block.lines and not (last_block.lines[0].startswith("loop") or last_block.lines[0].startswith("while")):
+            last_block.lines.pop(0)
+        return Executer.run(last_block)
 
 
 class Future:
@@ -96,6 +109,8 @@ class Executer:
             _value = block.stack.run()
         elif result == BREAK:
             _value = block.stack.catch_break()
+        elif result == CONTINUE:
+            _value = block.stack.catch_continue(block)
         else:
             _value = result
         if _future is not None:
@@ -119,6 +134,8 @@ class Executer:
                 block.stack.run()
             elif result == BREAK:
                 block.stack.catch_break()
+            elif result == CONTINUE:
+                block.stack.catch_continue(block)
 
             # return result
         Executer.blocks.pop(0)
@@ -161,6 +178,9 @@ class Block:
 
                 elif match("break"):
                     return BREAK
+
+                elif match("continue"):
+                    return CONTINUE
 
                 elif match("let", name, "be", [value]):
                     _name, _value = matches()
