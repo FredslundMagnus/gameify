@@ -91,6 +91,7 @@ class Future:
 class Executer:
     blocks: list[list[Block]] = [[]]
     temp: list[tuple[Block, int]] = []
+    frame: int = 0
 
     @staticmethod
     def add(block: Block, frame: int = 0) -> Block:
@@ -139,6 +140,7 @@ class Executer:
 
             # return result
         Executer.blocks.pop(0)
+        Executer.frame += 1
 
 
 class Block:
@@ -279,6 +281,7 @@ class Code:
             self.game = MazeGame(680, 520)
         scope = self.game.objects
         scope["random"] = random
+        scope["get_frame"] = lambda: Executer.frame
         Executer.run(Block(lines, scope, Stack()))
 
     def execute(self) -> None:

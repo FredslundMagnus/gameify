@@ -19,7 +19,7 @@ class Ball(GameObject):
         return Rect(self.center.x - self.radius, self.center.y - self.radius, self.radius*2, self.radius*2)
 
     def update(self, platforms: list[Platform], goals: list[Goal]):
-        self.speed.x, self.speed.y = max(min(self.speed.x, 10),-10), max(min(self.speed.y,10),-10)
+        self.speed.x, self.speed.y = max(min(self.speed.x, 10), -10), max(min(self.speed.y, 10), -10)
         self.center = XandY(self.center.x + self.speed.x, self.center.y + self.speed.y)
         collides = False
         for platform in platforms:
@@ -36,8 +36,6 @@ class Ball(GameObject):
                 self.speed = XandY(self.speed.x, abs(self.speed.y))
         if not collides:
             self.speed.y += self.gravity
-                
-
 
 
 class Platform(GameObject):
@@ -78,9 +76,10 @@ class Goal(GameObject):
                 ball.center.x = -100
                 self.collides += 1
                 if self.collides >= self.balls_to_win:
-                    print("YOU WIN!") 
+                    print("YOU WIN!")
                 else:
                     print("You just need to get " + str(self.balls_to_win - self.collides) + " more ball(s) into the goal to win!")
+
 
 class BallGame(Game):
     types = [Ball, Platform, Goal, Colors]
@@ -122,14 +121,11 @@ class BallGame(Game):
                 speed_dif = (ball.speed.x - ball2.speed.x, ball.speed.y - ball2.speed.y)
                 speed_proj = speed_dif[0] * pos_dif_norm[0] + speed_dif[1] * pos_dif_norm[1]
                 relative_weight = ball.weight / ball2.weight
-                
+
                 ball.speed.x -= 2 * pos_dif_norm[0] * speed_proj / (relative_weight + 1)
                 ball.speed.y -= 2 * pos_dif_norm[1] * speed_proj / (relative_weight + 1)
                 ball2.speed.x += 2 * pos_dif_norm[0] * speed_proj * relative_weight / (relative_weight + 1)
                 ball2.speed.y += 2 * pos_dif_norm[1] * speed_proj * relative_weight / (relative_weight + 1)
-
-
-
 
     def update(self) -> None:
         for platform in self.platforms:
