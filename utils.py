@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import Callable, Generic, TypeVar
 
 
 @dataclass
@@ -125,3 +126,25 @@ class Position:
 
     def __repr__(self) -> str:
         return str((self.position[0], 12-self.position[1]))
+
+
+X = TypeVar('X')
+
+
+class Observable(Generic[X]):
+    def __init__(self, value: X, on_change: Callable[[X], None] | None = None) -> None:
+        self._value: X = value
+        if on_change != None:
+            self.on_change = on_change
+
+    @property
+    def value(self) -> X:
+        return self.value
+
+    def on_change(self, new_value: X) -> None:
+        pass
+
+    @value.setter
+    def value(self, new_value: X):
+        self._value = new_value
+        self.on_change(new_value)
