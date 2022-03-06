@@ -14,8 +14,3 @@ if goal_location {
 
 
 # SOLUTION
-if goal_location {
-    set ball.speed.x to -3
-} else {
-    set ball.speed.x to 3
-}

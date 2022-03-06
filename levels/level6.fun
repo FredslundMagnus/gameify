@@ -13,4 +13,3 @@ set ball_2.speed.x to 6
 let goal be Goal(300, 30, 50, 50)
 
 # SOLUTION
-set ball_1.weight to 100

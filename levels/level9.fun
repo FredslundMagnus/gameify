@@ -35,11 +35,3 @@ every 200 frames {
 # SOLUTION
 
 # Du skal bruge go_right i din løsning
-do print(go_right)
-
-if go_right {
-    set ball.speed.x to 2
-} else {
-    wait 30 frames
-    set ball.speed.x to 2
-}

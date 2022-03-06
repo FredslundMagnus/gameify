@@ -10,7 +10,6 @@ let platforms_3 be Platform(450, 300, 50, 20)
 let goal be Goal(550, 110, 50, 50)
 
 # SOLUTION
-wait 60 frames
-set ball_1.speed.x to 2
+
 
     

@@ -15,6 +15,3 @@ let goal be Goal(550, 110, 50, 50)
 
 
 # SOLUTION
-every 47 frames {
-    set ball.speed.y to 4
-}

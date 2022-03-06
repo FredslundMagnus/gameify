@@ -76,7 +76,7 @@ class Goal(GameObject):
                 ball.center.x = -100
                 self.collides += 1
                 if self.collides >= self.balls_to_win:
-                    print("YOU WIN!")
+                    print("YOU WIN! Congratz bro, amazing work :)")
                 else:
                     print("You just need to get " + str(self.balls_to_win - self.collides) + " more ball(s) into the goal to win!")
 

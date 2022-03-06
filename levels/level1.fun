@@ -11,4 +11,3 @@ let platforms_6 be Platform(350, 283, 20, 100)
 let goal be Goal(500, 250, 50, 50)
 
 # SOLUTION
-set ball_1.speed.x to -3

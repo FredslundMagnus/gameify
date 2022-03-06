@@ -19,10 +19,3 @@ every 100 frames {
     set platforms_3.speed.x to -platforms_3.speed.x
 }
 # SOLUTION
-set ball.speed.x to 1
-wait 50 frames
-set ball.speed.x to 1.5
-wait 150 frames
-set ball.speed.x to 0
-wait 50 frames
-set ball.speed.x to 1

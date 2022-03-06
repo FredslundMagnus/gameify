@@ -30,43 +30,6 @@ let climbing be 1
 
 # SOLUTION
 
-make climb_up(ball) {
-    set ball.speed.y to -5
-    wait 30 frames
-    set ball.speed.x to 1
-    wait 50 frames
-    set ball.speed.x to 0
-    set ball.speed.y to -5
-    wait 30 frames
-    set ball.speed.x to -1
-    wait 50 frames
-    set ball.speed.x to 0
-    set ball.speed.y to 5
-    wait 30 frames
-    set ball.speed.x to 1
-    wait 50 frames
-    set ball.speed.x to 0
-    set ball.speed.y to -5
-    wait 30 frames
-    set ball.speed.x to 1
-}
-
-make prepare_climb(ball) {
-    set ball_1.speed.y to 0
-    set ball_1.speed.x to 1
-    wait 100 frames
-    set ball_1.speed.x to 0 
-}
-
-do climb_up(ball_1)
-wait 435 frames
-do prepare_climb(ball_1)
-wait 100 frames
-do climb_up(ball_1)
-wait 435 frames
-do prepare_climb(ball_1)
-wait 100 frames
-do climb_up(ball_1)
 
 
 

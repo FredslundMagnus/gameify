@@ -13,10 +13,5 @@ set ball_1.speed.y to 3
 let goal be Goal(350, 300, 50, 50)
 
 # SOLUTION
-wait 20 frames
-set ball_1.speed.x to 2
-wait 100 frames
-set ball_1.speed.x to 7
-set ball_1.speed.y to -6
 
  
